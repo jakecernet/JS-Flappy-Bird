@@ -33,7 +33,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This is my personal webpage.
+Remake of the game "Flappy Bird" in Java Script.
 
 
 
