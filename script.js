@@ -1,80 +1,102 @@
-// Initialize canvas and context
 const canvas = document.getElementById("canvas");
-canvas.width = window.innerWidth - 40;
-canvas.height = window.innerHeight - 40;
 const ctx = canvas.getContext("2d");
 
-// Load assets
-const bgImg = new Image();
+// Set up the canvas
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Constants
 const birdImg = new Image();
-const pipeUpImg = new Image();
-const pipeDownImg = new Image();
-
-// Set the source of the images
-bgImg.src = "assets/background.png";
 birdImg.src = "assets/bird.png";
-pipeUpImg.src = "assets/pipeUp.png";
-pipeDownImg.src = "assets/pipeDown.png";
-
-// Initialize game variables
-let birdY = canvas.height / 2 - 25;
+const birdX = canvas.width / 2;
+let birdY = canvas.height / 2;
 let birdDY = 0;
-const pipeGap = 150;
+const birdSize = 50;
+const pipeWidth = 80;
 const pipeSpeed = 3;
-const pipeSpacing = 300;
-let pipeX = canvas.width;
-let pipeY = pipeGap + Math.random() * (canvas.height - 2 * pipeGap);
+const pipeImg = new Image();
+pipeImg.src = "assets/pipe.png";
 
-// Update the game state
-function update() {
-  // Move the bird
-  birdY += birdDY;
-  birdDY += 0.5;
+// Variables
+let frameCount = 0;
+let pipes = [];
 
-  // Move the pipes
-  pipeX -= pipeSpeed;
-
-  // Check for collision with pipes
-  if (
-    (pipeX < 100 && pipeX > 50) &&
-    (birdY < pipeY || birdY > pipeY + pipeGap)
-  ) {
-    console.log("Game over!");
-  }
-
-  // Reset the pipes when they go offscreen
-  if (pipeX < -100) {
-    pipeX = canvas.width + pipeSpacing;
-    pipeY = pipeGap + Math.random() * (canvas.height - 2 * pipeGap);
-  }
-}
-
-// Draw the game elements
-function draw() {
-  // Draw the background
-  ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-
-  // Draw the bird
-  ctx.drawImage(birdImg, 50, birdY, 50, 50);
-
-  // Draw the pipes
-  ctx.drawImage(pipeUpImg, pipeX, pipeY - 400, 100, 400);
-  ctx.drawImage(pipeDownImg, pipeX, pipeY + pipeGap, 100, 400);
-}
-
-// Run the game loop
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
+// Draw an image
+function drawImage(img, x, y, width, height) {
+    ctx.drawImage(img, x, y, width, height);
 }
 
 // Handle key events to move the bird
-document.addEventListener("keydown", function(event) {
-  if (event.code === "Space") {
+function handleKeyDown(event) {
+    if (event.code === "Space") {
+        birdDY = -8;
+    }
+}
+
+// Handle mouse events to move the bird
+function handleMouseDown(event) {
     birdDY = -8;
-  }
-});
+}
+
+// Draw the pipes
+function drawPipes() {
+    // Add a new pipe every 100 frames
+    if (frameCount % 100 === 0) {
+        const gap = 200; // The gap between the pipes
+        const minHeight = 100; // The minimum height of the top pipe
+        const maxHeight = canvas.height - gap - minHeight; // The maximum height of the top pipe
+        const height1 = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight; // The height of the top pipe
+        const height2 = canvas.height - gap - height1; // The height of the bottom pipe
+        pipes.push({ x: canvas.width, y: 0, width: pipeWidth, height: height1 });
+        pipes.push({ x: canvas.width, y: canvas.height - height2, width: pipeWidth, height: height2 });
+    }
+
+    // Move and draw the pipes
+    for (let i = 0; i < pipes.length; i++) {
+        const pipe = pipes[i];
+        pipe.x -= pipeSpeed;
+        drawImage(pipeImg, pipe.x, pipe.y, pipe.width, pipe.height);
+    }
+
+    // Remove pipes that have gone off screen
+    if (pipes[0].x + pipes[0].width < 0) {
+        pipes.shift();
+        pipes.shift();
+    }
+}
+
+// Draw the bird
+function drawBird() {
+    drawImage(birdImg, birdX - birdSize / 2, birdY - birdSize / 2, birdSize, birdSize);
+}
+
+// Update the game state
+function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Move the bird
+    birdDY += 0.5;
+    birdY += birdDY;
+
+    // Draw the background
+    drawImage(new Image(canvas.width, canvas.height), 0, 0, canvas.width, canvas.height);
+
+    // Draw the pipes
+    drawPipes();
+
+    // Draw the bird
+    drawBird();
+
+    // Increment the frame count
+    frameCount++;
+
+    // Request another frame
+    requestAnimationFrame(update);
+}
 
 // Start the game loop
-gameLoop();
+requestAnimationFrame(update);
+
+// Add event listeners
+document.addEventListener("keydown", handleKeyDown);
+document.addEventListener("mousedown", handleMouseDown);
