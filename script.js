@@ -72,42 +72,62 @@ function drawBird() {
 
 // Update the game state
 function update() {
-    // Clear the canvas
+    //clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Check if the bird is touching a pipe
+    for (let i = 0; i < pipes.length; i++) {
+        const pipe = pipes[i];
+        if (birdX - birdSize / 2 < pipe.x + pipe.width &&
+            birdX + birdSize / 2 > pipe.x &&
+            birdY - birdSize / 2 < pipe.y + pipe.height &&
+            birdY + birdSize / 2 > pipe.y) {
+            // Bird is touching a pipe, stop the game
+            stopGame();
+            return;
+        }
+    }
+
+    // Check if the bird is below a certain Y level
+    const bottomY = canvas.height - birdSize / 2;
+    if (birdY > bottomY) {
+        // Bird is below the Y level, stop the game
+        stopGame();
+        return;
+    }
 
     // Move the bird
     birdDY += 0.5;
     birdY += birdDY;
-  
+
     // Draw the background
     drawImage(new Image(canvas.width, canvas.height), 0, 0, canvas.width, canvas.height);
-  
+
     // Draw the pipes
     drawPipes();
-  
+
     // Draw the bird
     drawBird();
-  
-    // Check for collision
-    for (let i = 0; i < pipes.length; i++) {
-      const pipe = pipes[i];
-      if (birdX < pipe.x + pipe.width &&
-          birdX + birdSize > pipe.x &&
-          birdY < pipe.y + pipe.height &&
-          birdY + birdSize > pipe.y) {
-        // Collision detected, stop the game
-        alert("Game over!");
-        return;
-      }
-    }
-  
+
     // Increment the frame count
     frameCount++;
-  
+
     // Request another frame
     requestAnimationFrame(update);
-  }
-  
+}
+
+// Stop the game
+function stopGame() {
+    // Remove event listeners
+    document.removeEventListener("keydown", handleKeyDown);
+    document.removeEventListener("mousedown", handleMouseDown);
+
+    // Show game over message
+    alert("Game over!");
+
+    // Reload the page
+    location.reload();
+}
 
 // Start the game loop
 requestAnimationFrame(update);
