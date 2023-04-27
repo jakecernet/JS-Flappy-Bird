@@ -78,36 +78,36 @@ function update() {
     // Move the bird
     birdDY += 0.5;
     birdY += birdDY;
-  
+
     // Draw the background
     drawImage(new Image(canvas.width, canvas.height), 0, 0, canvas.width, canvas.height);
-  
+
     // Draw the pipes
     drawPipes();
-  
+
     // Draw the bird
     drawBird();
-  
+
     // Check for collision
     for (let i = 0; i < pipes.length; i++) {
-      const pipe = pipes[i];
-      if (birdX < pipe.x + pipe.width &&
-          birdX + birdSize > pipe.x &&
-          birdY < pipe.y + pipe.height &&
-          birdY + birdSize > pipe.y) {
-        // Collision detected, stop the game
-        alert("Game over!");
-        return;
-      }
+        const pipe = pipes[i];
+        if (birdX < pipe.x + pipe.width &&
+            birdX + birdSize > pipe.x &&
+            birdY < pipe.y + pipe.height &&
+            birdY + birdSize > pipe.y) {
+            // Collision detected, stop the game
+            alert("Game over!");
+            return;
+        }
     }
-  
+
     // Increment the frame count
     frameCount++;
-  
+
     // Request another frame
     requestAnimationFrame(update);
-  }
-  
+}
+
 
 // Start the game loop
 requestAnimationFrame(update);
