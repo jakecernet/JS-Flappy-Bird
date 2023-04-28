@@ -35,7 +35,9 @@
 
 Remake of the game "Flappy Bird" in Java Script.
 
+### Status
 
+This is still in development, But you can still play it.
 
 ### Built With
 
